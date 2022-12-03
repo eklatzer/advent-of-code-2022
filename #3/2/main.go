@@ -1,21 +1,18 @@
 package main
 
 import (
-	"bufio"
 	"log"
-	"os"
+
+	"advent-of-code-2022/helpers"
 )
 
 func main() {
-	file, err := os.Open("../input.txt")
+	scanner, file, err := helpers.GetInput("../input.txt")
+	defer file.Close()
 
 	if err != nil {
-		log.Fatalf("failed to open file: %v", err)
+		log.Fatalf(err.Error())
 	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-
-	scanner.Split(bufio.ScanLines)
 
 	var itemPrioritySum = 0
 
