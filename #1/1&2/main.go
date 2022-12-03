@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"sort"
 	"strconv"
@@ -9,37 +10,34 @@ import (
 )
 
 func main() {
-	scanner, file, err := helpers.GetInput("../input.txt")
+	numberOfElves := *flag.Int("n", 3, "Number of top elves to sum up")
+	flag.Parse()
+
+	scanner, file, err := helpers.GetInput(helpers.GetInputFilePath())
 	defer file.Close()
 
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	var calories = []int{}
-	var currentCalories = 0
+	var caloriesPerElve = make([]int, 1)
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		if line == "" {
-			calories = append(calories, currentCalories)
-			currentCalories = 0
-			continue
-		}
 		c, err := strconv.Atoi(line)
 		if err != nil {
-			log.Printf("failed to convert line to int: %v\n", err)
+			caloriesPerElve = append(caloriesPerElve, 0)
 			continue
 		}
-		currentCalories += c
+		caloriesPerElve[len(caloriesPerElve)-1] += c
 	}
-	sort.Sort(sort.Reverse(sort.IntSlice(calories)))
+	sort.Sort(sort.Reverse(sort.IntSlice(caloriesPerElve)))
 
 	var totalCaloriesForTopElves = 0
-	for i := 0; i < 3; i++ {
-		log.Printf("#%d: %d calories", i+1, calories[i])
-		totalCaloriesForTopElves += calories[i]
+	for i := 0; i < numberOfElves; i++ {
+		log.Printf("#%d: %d calories", i+1, caloriesPerElve[i])
+		totalCaloriesForTopElves += caloriesPerElve[i]
 	}
-	log.Print("----")
-	log.Printf("total calories of top elves: %d calories", totalCaloriesForTopElves)
+	log.Print("------------------------")
+	log.Printf("total calories of top %d elves: %d calories", numberOfElves, totalCaloriesForTopElves)
 }
