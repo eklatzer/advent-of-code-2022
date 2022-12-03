@@ -1,35 +1,47 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"strings"
 
 	"advent-of-code-2022/helpers"
 )
 
-var identifierToAction = map[string]string{
-	"X": "Rock",
-	"Y": "Paper",
-	"Z": "Scissors",
-	"A": "Rock",
-	"B": "Paper",
-	"C": "Scissors",
+type action string
+
+const (
+	rock     action = "Rock"
+	paper           = "Paper"
+	scissors        = "Scissors"
+)
+
+var identifierToAction = map[string]action{
+	"X": rock,
+	"Y": paper,
+	"Z": scissors,
+	"A": rock,
+	"B": paper,
+	"C": scissors,
 }
 
-var pointsForUsage = map[string]int{
-	"Rock":     1,
-	"Paper":    2,
-	"Scissors": 3,
+var pointsForAction = map[action]int{
+	rock:     1,
+	paper:    2,
+	scissors: 3,
 }
 
-var actionWinsAgainst = map[string]string{
-	"Rock":     "Scissors",
-	"Paper":    "Rock",
-	"Scissors": "Paper",
+var actionWinsAgainst = map[action]action{
+	rock:     scissors,
+	paper:    rock,
+	scissors: paper,
 }
 
 func main() {
-	scanner, file, err := helpers.GetInput("../input.txt")
+	flag.Parse()
+
+	scanner, file, err := helpers.GetInput(helpers.GetInputFilePath())
 	defer file.Close()
 
 	if err != nil {
@@ -39,31 +51,38 @@ func main() {
 	var score int
 
 	for scanner.Scan() {
-		line := scanner.Text()
 
-		lineParts := strings.Split(line, " ")
-		if len(lineParts) != 2 {
-			log.Printf("invalid number of parts per lined split by space: %d\n", len(lineParts))
+		actionPlayer1, actionPlayer2, err := extractActionsFromLine(scanner.Text())
+		if err != nil {
+			log.Println(err.Error())
 			continue
 		}
 
-		action0, found0 := identifierToAction[lineParts[0]]
-		action1, found1 := identifierToAction[lineParts[1]]
-		if !(found0 && found1) {
-			log.Printf("unknown action in line: %s", line)
-			continue
-		}
+		score += pointsForAction[actionPlayer2]
 
-		score += pointsForUsage[action1]
-
-		if action0 == action1 {
+		if actionPlayer1 == actionPlayer2 {
 			score += 3
 		} else {
-			currentActionWinsAgainst := actionWinsAgainst[action1]
-			if currentActionWinsAgainst == action0 {
+			currentActionWinsAgainst := actionWinsAgainst[actionPlayer2]
+			if currentActionWinsAgainst == actionPlayer1 {
 				score += 6
 			}
 		}
 	}
-	log.Printf("total score: %d\n", score)
+	log.Printf("total score: %d", score)
+}
+
+func extractActionsFromLine(line string) (action, action, error) {
+	lineParts := strings.Split(line, " ")
+	if len(lineParts) != 2 {
+		return "", "", fmt.Errorf("invalid line, expected two characters split by space, got: %q", line)
+	}
+
+	actionPlayer1, foundAction1 := identifierToAction[lineParts[0]]
+	actionPlayer2, foundAction2 := identifierToAction[lineParts[1]]
+	if !(foundAction1 && foundAction2) {
+		return "", "", fmt.Errorf("unknown action in line: %q", line)
+	}
+
+	return actionPlayer1, actionPlayer2, nil
 }

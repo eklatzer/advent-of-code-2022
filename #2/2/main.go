@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"strings"
 
@@ -29,7 +30,9 @@ var actionWinsAgainst = map[string]string{
 }
 
 func main() {
-	scanner, file, err := helpers.GetInput("../input.txt")
+	flag.Parse()
+
+	scanner, file, err := helpers.GetInput(helpers.GetInputFilePath())
 	defer file.Close()
 
 	if err != nil {
