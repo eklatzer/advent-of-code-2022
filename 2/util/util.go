@@ -5,26 +5,24 @@ import (
 	"strings"
 )
 
-type Action string
-type GameOutcome string
-
+// Contains the possible values for actions and outcomes of Rock Paper Scissors games.
 const (
-	Rock     Action = "Rock"
-	Paper           = "Paper"
-	Scissors        = "Scissors"
+	Rock     = "Rock"
+	Paper    = "Paper"
+	Scissors = "Scissors"
 
-	Draw GameOutcome = "Draw"
-	Lose GameOutcome = "Lose"
-	Win  GameOutcome = "Win"
+	Draw = "Draw"
+	Lose = "Lose"
+	Win  = "Win"
 )
 
-var identifierToOutcome = map[string]GameOutcome{
+var identifierToOutcome = map[string]string{
 	"X": Lose,
 	"Y": Draw,
 	"Z": Win,
 }
 
-var identifierToAction = map[string]Action{
+var identifierToAction = map[string]string{
 	"X": Rock,
 	"Y": Paper,
 	"Z": Scissors,
@@ -33,41 +31,36 @@ var identifierToAction = map[string]Action{
 	"C": Scissors,
 }
 
-var pointsForAction = map[Action]int{
+var pointsForAction = map[string]int{
 	Rock:     1,
 	Paper:    2,
 	Scissors: 3,
 }
 
-var actionWinsAgainst = map[Action]Action{
+var actionWinsAgainst = map[string]string{
 	Rock:     Scissors,
 	Paper:    Rock,
 	Scissors: Paper,
 }
 
-func ExtractActionsFromLine(line string) (Action, Action, error) {
-	lineParts := strings.Split(line, " ")
-	if len(lineParts) != 2 {
-		return "", "", fmt.Errorf("invalid line, expected two characters split by space, got: %q", line)
-	}
-
-	actionPlayer1, foundAction1 := identifierToAction[lineParts[0]]
-	actionPlayer2, foundAction2 := identifierToAction[lineParts[1]]
-	if !(foundAction1 && foundAction2) {
-		return "", "", fmt.Errorf("unknown action in line: %q", line)
-	}
-
-	return actionPlayer1, actionPlayer2, nil
+// ExtractActionsFromLine extracts the actions in a line, represented by two characters separated by a space.
+func ExtractActionsFromLine(line string) (string, string, error) {
+	return extractValues(line, identifierToAction, identifierToAction)
 }
 
-func ExtractActionAndGameOutcomeFromLine(line string) (Action, GameOutcome, error) {
+// ExtractActionAndGameOutcomeFromLine extracts the actions/expected outcome in a line, represented by two characters separated by a space.
+func ExtractActionAndGameOutcomeFromLine(line string) (string, string, error) {
+	return extractValues(line, identifierToAction, identifierToOutcome)
+}
+
+func extractValues(line string, mappingForFirstValue map[string]string, mappingForSecondValue map[string]string) (string, string, error) {
 	lineParts := strings.Split(line, " ")
 	if len(lineParts) != 2 {
 		return "", "", fmt.Errorf("invalid line, expected two characters split by space, got: %q", line)
 	}
 
-	actionPlayer1, foundAction := identifierToAction[lineParts[0]]
-	outcome, foundOutcome := identifierToOutcome[lineParts[1]]
+	actionPlayer1, foundAction := mappingForFirstValue[lineParts[0]]
+	outcome, foundOutcome := mappingForSecondValue[lineParts[1]]
 	if !(foundAction && foundOutcome) {
 		return "", "", fmt.Errorf("unknown action in line: %q", line)
 	}
@@ -75,18 +68,21 @@ func ExtractActionAndGameOutcomeFromLine(line string) (Action, GameOutcome, erro
 	return actionPlayer1, outcome, nil
 }
 
-func GetPointsForAction(a Action) int {
+// GetPointsForAction returns the points a player gets when using a specific action.
+func GetPointsForAction(a string) int {
 	return pointsForAction[a]
 }
 
-func ActionWinsAgainst(a Action) Action {
+// ActionWinsAgainst returns the action the given action wins against.
+func ActionWinsAgainst(a string) string {
 	return actionWinsAgainst[a]
 }
 
-func ActionLosesAgainst(action Action) Action {
-	for a, winsAgainst := range actionWinsAgainst {
-		if winsAgainst == action {
-			return a
+// ActionLosesAgainst returns the action the given action loses against.
+func ActionLosesAgainst(currentAction string) string {
+	for action, winsAgainst := range actionWinsAgainst {
+		if winsAgainst == currentAction {
+			return action
 		}
 	}
 	return ""

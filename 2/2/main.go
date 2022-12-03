@@ -27,7 +27,7 @@ func main() {
 			continue
 		}
 
-		var actionPlayer2 util.Action
+		var actionPlayer2 string
 
 		switch expectedOutcome {
 		case util.Draw:
