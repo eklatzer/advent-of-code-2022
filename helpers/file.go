@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// GetInput returns the input file split by lines.
 func GetInput(filepath string) (*bufio.Scanner, *os.File, error) {
 	file, err := os.Open(filepath)
 
