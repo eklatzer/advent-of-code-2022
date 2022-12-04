@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	scanner, file, err := helpers.GetInput("../input.txt")
+	scanner, file, err := helpers.GetInput(helpers.GetInputFilePath())
 	defer file.Close()
 
 	if err != nil {
