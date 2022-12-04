@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"advent-of-code-2022/3/util"
 	"advent-of-code-2022/helpers"
 )
 
@@ -19,7 +20,7 @@ func main() {
 	for scanner.Scan() {
 		bytesPerLine := scanner.Bytes()
 
-		var itemExistsInFirstCompartment = map[byte]struct{}{}
+		var itemExistsInFirstCompartment = util.ByteSet{}
 
 		for i, itemIdentifier := range bytesPerLine {
 			if isItemOfFirstCompartment(i, len(bytesPerLine)) {
