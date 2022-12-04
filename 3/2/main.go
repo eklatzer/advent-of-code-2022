@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 
-	"advent-of-code-2022/3/util"
 	"advent-of-code-2022/helpers"
 )
 
@@ -17,7 +16,8 @@ func main() {
 
 	var itemPrioritySum = 0
 
-	var itemsForElves = []util.ByteSet{{}, {}}
+	var itemsForElves = []helpers.Set[byte]{{}, {}}
+
 	var elveNumber = 1
 
 	for scanner.Scan() {
@@ -31,7 +31,7 @@ func main() {
 			for _, itemIdentifier := range bytesPerLine {
 				if hasItem(itemIdentifier, itemsForElves[0]) && hasItem(itemIdentifier, itemsForElves[1]) {
 					itemPrioritySum += int(getScoreForItem(itemIdentifier))
-					itemsForElves = []util.ByteSet{{}, {}}
+					itemsForElves = []helpers.Set[byte]{{}, {}}
 					elveNumber = 0
 					break
 				}
@@ -54,7 +54,7 @@ func isUpper(x byte) bool {
 	return 'A' <= x && x <= 'Z'
 }
 
-func hasItem(itemIdentifer byte, items util.ByteSet) bool {
+func hasItem(itemIdentifer byte, items helpers.Set[byte]) bool {
 	_, exists := items[itemIdentifer]
 	return exists
 }
