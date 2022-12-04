@@ -33,10 +33,8 @@ func main() {
 		case util.Draw:
 			score += 3
 			actionPlayer2 = actionPlayer1
-			break
 		case util.Lose:
 			actionPlayer2 = util.ActionWinsAgainst(actionPlayer1)
-			break
 		case util.Win:
 			score += 6
 			actionPlayer2 = util.ActionLosesAgainst(actionPlayer1)
