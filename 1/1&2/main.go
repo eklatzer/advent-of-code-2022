@@ -31,12 +31,12 @@ func main() {
 		}
 		caloriesPerElve[len(caloriesPerElve)-1] += c
 	}
-	sort.Sort(sort.Reverse(sort.IntSlice(caloriesPerElve)))
+	sort.Sort(sort.IntSlice(caloriesPerElve))
 
 	var totalCaloriesForTopElves = 0
-	for i := 0; i < numberOfElves; i++ {
-		log.Printf("#%d: %d calories", i+1, caloriesPerElve[i])
-		totalCaloriesForTopElves += caloriesPerElve[i]
+	for i := 1; i <= numberOfElves; i++ {
+		log.Printf("#%d: %d calories", i, caloriesPerElve[len(caloriesPerElve)-i])
+		totalCaloriesForTopElves += caloriesPerElve[len(caloriesPerElve)-i]
 	}
 	log.Print("------------------------")
 	log.Printf("total calories of top %d elves: %d calories", numberOfElves, totalCaloriesForTopElves)
