@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	"advent-of-code-2022/5/util"
@@ -12,7 +12,7 @@ import (
 
 func main() {
 	// trying out different version of file-reading
-	filecontent, err := ioutil.ReadFile(helpers.GetInputFilePath())
+	filecontent, err := os.ReadFile(helpers.GetInputFilePath())
 	if err != nil {
 		log.Fatalf("failed to read input file at %q: %v", helpers.GetInputFilePath(), err)
 	}
