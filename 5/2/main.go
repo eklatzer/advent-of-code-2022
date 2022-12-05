@@ -18,9 +18,10 @@ func main() {
 	}
 	lines := strings.Split(string(filecontent), "\n")
 
-	ship, moves := util.ExtractShipAndMoves(lines)
-	for _, move := range moves {
-		ship.ExecuteCommand(move, false)
+	ship, endIndex := util.ExtractShipAndGetEndIndex(lines)
+	for _, move := range lines[endIndex:] {
+		cmd := util.ParseCommand(move)
+		ship.ExecuteCommand(cmd, false)
 	}
 	fmt.Println("Top Crates:")
 	for _, stack := range ship {

@@ -11,14 +11,14 @@ type Ship []Stack
 // Stack represents one stack of crates.
 type Stack []byte
 
-// ExtractShipAndMoves extracts the ship at the start and the commands.
-func ExtractShipAndMoves(lines []string) (Ship, []string) {
+// ExtractShipAndGetEndIndex extracts the ship and returns the index of the first line after the ship.
+func ExtractShipAndGetEndIndex(lines []string) (Ship, int) {
 	var ship = Ship{}
 	for lineIndex, line := range lines {
 		for i := 1; i < len(line); i += 4 {
 			var c = line[i]
 			if isDigit(c) {
-				return ship, lines[(lineIndex + 2):]
+				return ship, lineIndex + 1
 			}
 			if !isSpace(c) {
 				stackIndex := (i - 1) / 4
@@ -26,7 +26,7 @@ func ExtractShipAndMoves(lines []string) (Ship, []string) {
 			}
 		}
 	}
-	return nil, nil
+	return nil, 0
 }
 
 func isDigit(in byte) bool {
@@ -52,16 +52,14 @@ type command struct {
 }
 
 // ExecuteCommand executes a command in the format 'move 1 from 6 to 8'.
-func (s Ship) ExecuteCommand(commandLine string, reverseItems bool) {
-	if commandLine != "" {
-		cmd := getCommand(commandLine)
-		movedItems := append(Stack{}, s[cmd.from][0:cmd.amount]...)
-		if reverseItems {
-			movedItems.reverse()
-		}
-		s[cmd.from] = s[cmd.from][cmd.amount:]
-		s[cmd.to] = append(movedItems, s[cmd.to]...)
+func (s Ship) ExecuteCommand(cmd command, reverseItems bool) {
+	movedItems := append(Stack{}, s[cmd.from][0:cmd.amount]...)
+	if reverseItems {
+		movedItems.reverse()
 	}
+	s[cmd.from] = s[cmd.from][cmd.amount:]
+	s[cmd.to] = append(movedItems, s[cmd.to]...)
+
 }
 
 func (st Stack) reverse() Stack {
@@ -71,7 +69,10 @@ func (st Stack) reverse() Stack {
 	return st
 }
 
-func getCommand(commandLine string) command {
+func ParseCommand(commandLine string) command {
+	if commandLine == "" {
+		return command{}
+	}
 	parts := strings.Split(commandLine, " ")
 	return command{
 		amount: toInt(parts[1]),
