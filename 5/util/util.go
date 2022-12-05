@@ -29,6 +29,37 @@ func ExtractShipAndGetEndIndex(lines []string) (Ship, int) {
 	return nil, 0
 }
 
+// ExecuteCommand executes the given command on the ship.
+func (s Ship) ExecuteCommand(cmd Command, reverseItems bool) {
+	movedItems := append(Stack{}, s[cmd.from][0:cmd.amount]...)
+	if reverseItems {
+		movedItems.reverse()
+	}
+	s[cmd.from] = s[cmd.from][cmd.amount:]
+	s[cmd.to] = append(movedItems, s[cmd.to]...)
+
+}
+
+// Command is one command handling the movement of amount items from the index from to the index to.
+type Command struct {
+	amount int
+	from   int
+	to     int
+}
+
+// ParseCommand parses a command in the format 'move 1 from 6 to 8'.
+func ParseCommand(commandLine string) Command {
+	if commandLine == "" {
+		return Command{}
+	}
+	parts := strings.Split(commandLine, " ")
+	return Command{
+		amount: toInt(parts[1]),
+		from:   toInt(parts[3]) - 1,
+		to:     toInt(parts[5]) - 1,
+	}
+}
+
 func isDigit(in byte) bool {
 	return in >= '0' && in <= '9'
 }
@@ -45,40 +76,11 @@ func (s *Ship) addElement(value byte, index int) {
 	(*s)[index] = append((*s)[index], value)
 }
 
-type command struct {
-	amount int
-	from   int
-	to     int
-}
-
-// ExecuteCommand executes a command in the format 'move 1 from 6 to 8'.
-func (s Ship) ExecuteCommand(cmd command, reverseItems bool) {
-	movedItems := append(Stack{}, s[cmd.from][0:cmd.amount]...)
-	if reverseItems {
-		movedItems.reverse()
-	}
-	s[cmd.from] = s[cmd.from][cmd.amount:]
-	s[cmd.to] = append(movedItems, s[cmd.to]...)
-
-}
-
 func (st Stack) reverse() Stack {
 	for i, j := 0, len(st)-1; i < j; i, j = i+1, j-1 {
 		st[i], st[j] = st[j], st[i]
 	}
 	return st
-}
-
-func ParseCommand(commandLine string) command {
-	if commandLine == "" {
-		return command{}
-	}
-	parts := strings.Split(commandLine, " ")
-	return command{
-		amount: toInt(parts[1]),
-		from:   toInt(parts[3]) - 1,
-		to:     toInt(parts[5]) - 1,
-	}
 }
 
 func toInt(in string) int {
