@@ -55,19 +55,13 @@ type command struct {
 func (s Ship) ExecuteCommand(commandLine string, reverseItems bool) {
 	if commandLine != "" {
 		cmd := getCommand(commandLine)
-		movedItems := shallowCopy(s[cmd.from][0:cmd.amount])
+		movedItems := append(Stack{}, s[cmd.from][0:cmd.amount]...)
 		if reverseItems {
 			movedItems.reverse()
 		}
 		s[cmd.from] = s[cmd.from][cmd.amount:]
 		s[cmd.to] = append(movedItems, s[cmd.to]...)
 	}
-}
-
-func shallowCopy(in Stack) Stack {
-	newArray := make(Stack, len(in))
-	copy(newArray, in)
-	return newArray
 }
 
 func (st Stack) reverse() Stack {
