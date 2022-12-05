@@ -30,11 +30,11 @@ func ExtractShipAndMoves(lines []string) (Ship, []string) {
 }
 
 func isDigit(in byte) bool {
-	return in >= 48 && in <= 57
+	return in >= '0' && in <= '9'
 }
 
 func isSpace(in byte) bool {
-	return in == 32
+	return in == ' '
 }
 
 func (s *Ship) addElement(value byte, index int) {
