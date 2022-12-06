@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -9,6 +10,10 @@ import (
 	"advent-of-code-2022/5/util"
 	"advent-of-code-2022/helpers"
 )
+
+func init() {
+	flag.Parse()
+}
 
 func main() {
 	// trying out different version of file-reading

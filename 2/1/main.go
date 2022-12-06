@@ -8,9 +8,11 @@ import (
 	"advent-of-code-2022/helpers"
 )
 
-func main() {
+func init() {
 	flag.Parse()
+}
 
+func main() {
 	scanner, file, err := helpers.GetInput(helpers.GetInputFilePath())
 	defer file.Close()
 

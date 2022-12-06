@@ -1,10 +1,15 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"advent-of-code-2022/helpers"
 )
+
+func init() {
+	flag.Parse()
+}
 
 func main() {
 	scanner, file, err := helpers.GetInput(helpers.GetInputFilePath())
