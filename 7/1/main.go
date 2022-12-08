@@ -34,20 +34,8 @@ func main() {
 
 		if strings.HasPrefix(line, "$") {
 			if commandParts[1] == "cd" {
-				newLocation := commandParts[2]
-				if strings.HasPrefix(newLocation, "/") {
-					currentLocation = newLocation
-				} else if newLocation == ".." {
-					pathParts := strings.Split(currentLocation[1:], "/")
-					currentLocation = fmt.Sprintf("/%s", strings.Join(pathParts[:len(pathParts)-1], "/"))
-				} else {
-					currentLocation = filepath.Join(currentLocation, newLocation)
-				}
-
-				currentFolder = fileSystem.GetSubfolderAndCreateIfNotExists("/")
-				if currentLocation != "/" {
-					currentFolder = currentFolder.Subfolders.GetSubfolderRecursivelyFromRoot(strings.Split(currentLocation[1:], "/"))
-				}
+				currentLocation = util.GetNewTotalPath(currentLocation, commandParts[2])
+				currentFolder = fileSystem.GetSubfolderAndCreateIfNotExists("/").Subfolders.GetSubfolderRecursively(strings.Split(currentLocation[1:], "/"))
 			}
 		} else if strings.HasPrefix(line, "dir") {
 			currentFolder.Subfolders.GetSubfolderAndCreateIfNotExists(commandParts[1])
@@ -56,23 +44,17 @@ func main() {
 		}
 	}
 
-	log.Println(generateResult("", fileSystem))
-	log.Println("result:")
-	log.Println(testSum)
+	generateResult("", fileSystem)
+	log.Printf("sum of total sizes for directories < 100000: %d", testSum)
 }
 
 var testSum = 0
 
-func generateResult(pathBefore string, fileSystem util.FileSystem) int {
+func generateResult(parentPath string, fileSystem util.FileSystem) int {
 	var totalSize = 0
 	for path, folderContent := range fileSystem {
 		fileSize := folderContent.Files.TotalFileSize()
-		var currentPath = ""
-		if pathBefore == "" {
-			currentPath = fmt.Sprintf("%s", path)
-		} else {
-			currentPath = fmt.Sprintf("%s/%s", pathBefore, path)
-		}
+		var currentPath = filepath.Join(parentPath, path)
 		subSize := generateResult(currentPath, *folderContent.Subfolders)
 		if (fileSize + subSize) <= 100000 {
 			testSum += (fileSize + subSize)
