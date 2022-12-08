@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math"
 	"path/filepath"
 	"strings"
 
@@ -14,6 +15,9 @@ import (
 func init() {
 	flag.Parse()
 }
+
+const totalDiskSpace = 70000000
+const neededDiskSpaceForUpdate = 30000000
 
 func main() {
 	scanner, file, err := helpers.GetInput(helpers.GetInputFilePath())
@@ -48,11 +52,24 @@ func main() {
 		}
 	}
 
-	generateResult("", fileSystem)
+	totalDiskUsed := generateResult("", fileSystem)
+	freeDiskSpace := totalDiskSpace - totalDiskUsed
+	neededDiskSpace := neededDiskSpaceForUpdate - freeDiskSpace
+
+	fmt.Println("----")
+	var sizeOfFolderToDelete = math.MaxInt
+	for path, size := range valuePerPath {
+		if size >= neededDiskSpace && size < sizeOfFolderToDelete {
+			sizeOfFolderToDelete = size
+			fmt.Printf("%s could be deleted (size: %d)\n", path, size)
+		}
+	}
+	log.Printf("size of folder to delete: %d\n", sizeOfFolderToDelete)
 	log.Printf("sum of total sizes for directories < 100000: %d", testSum)
 }
 
 var testSum = 0
+var valuePerPath = map[string]int{}
 
 func generateResult(parentPath string, fileSystem util.FileSystem) int {
 	var totalSize = 0
@@ -62,8 +79,9 @@ func generateResult(parentPath string, fileSystem util.FileSystem) int {
 		subSize := generateResult(currentPath, *folderContent.Subfolders)
 		if (fileSize + subSize) <= 100000 {
 			testSum += (fileSize + subSize)
-			fmt.Printf("size for %s: %d (files: %d, sub: %d)\n", currentPath, (fileSize + subSize), fileSize, subSize)
 		}
+		valuePerPath[currentPath] = (fileSize + subSize)
+		fmt.Printf("size for %s: %d (files: %d, sub: %d)\n", currentPath, (fileSize + subSize), fileSize, subSize)
 		totalSize += fileSize + subSize
 	}
 	return totalSize
