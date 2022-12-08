@@ -35,7 +35,11 @@ func main() {
 		if strings.HasPrefix(line, "$") {
 			if commandParts[1] == "cd" {
 				currentLocation = util.GetNewTotalPath(currentLocation, commandParts[2])
-				currentFolder = fileSystem.GetSubfolderAndCreateIfNotExists("/").Subfolders.GetSubfolderRecursively(strings.Split(currentLocation[1:], "/"))
+
+				currentFolder = fileSystem.GetSubfolderAndCreateIfNotExists("/")
+				if currentLocation != "/" {
+					currentFolder = currentFolder.Subfolders.GetSubfolderRecursively(strings.Split(currentLocation[1:], "/"))
+				}
 			}
 		} else if strings.HasPrefix(line, "dir") {
 			currentFolder.Subfolders.GetSubfolderAndCreateIfNotExists(commandParts[1])
