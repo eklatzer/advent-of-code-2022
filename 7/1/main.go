@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -88,7 +89,7 @@ func main() {
 		line := scanner.Text()
 		var commandParts = strings.Split(line, " ")
 
-		if startsWith(line, "$") {
+		if strings.HasPrefix(line, "$") {
 			if commandParts[1] == "cd" {
 				newLocation := commandParts[2]
 				if newLocation == "/" {
@@ -104,7 +105,7 @@ func main() {
 						currentSubfolder = root.subfolders.getSubfolderRecursivelyFromRoot(strings.Split(currentLocation[1:], "/"))
 					}
 				} else {
-					currentLocation = appendPath(currentLocation, newLocation)
+					currentLocation = filepath.Join(currentLocation, newLocation)
 					if currentLocation == "/" {
 						currentSubfolder = fileSystem.getSubfolderAndCreateIfNotExists("/")
 					} else {
@@ -112,11 +113,12 @@ func main() {
 					}
 				}
 			}
-		} else if startsWith(line, "dir") {
+		} else if strings.HasPrefix(line, "dir") {
 			// Handle dir
 			currentSubfolder.subfolders.getSubfolderAndCreateIfNotExists(commandParts[1])
 		} else {
 			// handle file
+			log.Println(line)
 			currentSubfolder.files[commandParts[1]] = parseInt(commandParts[0])
 		}
 	}
@@ -126,33 +128,10 @@ func main() {
 	log.Println(testSum)
 }
 
-func appendPath(path, newSubfolder string) string {
-	if endsWith(path, "/") {
-		return fmt.Sprintf("%s%s", path, newSubfolder)
-	}
-	return fmt.Sprintf("%s/%s", path, newSubfolder)
-}
-
 func parseInt(in string) int {
 	val, err := strconv.Atoi(in)
 	if err != nil {
 		panic(err)
 	}
 	return val
-}
-
-func startsWith(haystack, needle string) bool {
-	haystack = strings.TrimSpace(haystack)
-	if len(haystack) < len(needle) {
-		return false
-	}
-	return haystack[0:len(needle)] == needle
-}
-
-func endsWith(haystack, needle string) bool {
-	haystack = strings.TrimSpace(haystack)
-	if len(haystack) < len(needle) {
-		return false
-	}
-	return haystack[len(haystack)-len(needle):] == needle
 }
