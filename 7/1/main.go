@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"advent-of-code-2022/7/util"
 	"advent-of-code-2022/helpers"
 )
 
@@ -16,18 +17,17 @@ func init() {
 
 var testSum = 0
 
-func generateResult(pathBefore string, fileSystem fileSystem) int {
+func generateResult(pathBefore string, fileSystem util.FileSystem) int {
 	var totalSize = 0
 	for path, folderContent := range fileSystem {
-		fileSize := totalFileSize(folderContent.files)
+		fileSize := folderContent.Files.TotalFileSize()
 		var currentPath = ""
 		if pathBefore == "" {
 			currentPath = fmt.Sprintf("%s", path)
 		} else {
 			currentPath = fmt.Sprintf("%s/%s", pathBefore, path)
 		}
-		subSize := generateResult(currentPath, *folderContent.subfolders)
-		//fmt.Printf("size for %s: %d (files: %d, sub: %d)\n", currentPath, (fileSize + subSize), fileSize, subSize)
+		subSize := generateResult(currentPath, *folderContent.Subfolders)
 		if (fileSize + subSize) <= 100000 {
 			testSum += (fileSize + subSize)
 			fmt.Printf("size for %s: %d (files: %d, sub: %d)\n", currentPath, (fileSize + subSize), fileSize, subSize)
@@ -37,40 +37,6 @@ func generateResult(pathBefore string, fileSystem fileSystem) int {
 	return totalSize
 }
 
-func totalFileSize(files filesInSystem) int {
-	var sum = 0
-	for _, size := range files {
-		sum += size
-	}
-	return sum
-}
-
-type fileSystem map[string]*folderWithFiles
-
-func (f *fileSystem) getSubfolderRecursivelyFromRoot(paths []string) *folderWithFiles {
-	if len(paths) == 1 {
-		return (*f).getSubfolderAndCreateIfNotExists(paths[0])
-	}
-	return (*f)[paths[0]].subfolders.getSubfolderRecursivelyFromRoot(paths[1:])
-}
-
-func (f *fileSystem) getSubfolderAndCreateIfNotExists(subpath string) *folderWithFiles {
-	if (*f)[subpath] == nil {
-		(*f)[subpath] = &folderWithFiles{
-			files:      filesInSystem{},
-			subfolders: &fileSystem{},
-		}
-	}
-	return (*f)[subpath]
-}
-
-type folderWithFiles struct {
-	files      filesInSystem
-	subfolders *fileSystem
-}
-
-type filesInSystem map[string]int
-
 func main() {
 	scanner, file, err := helpers.GetInput(helpers.GetInputFilePath())
 	defer file.Close()
@@ -79,10 +45,10 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	var fileSystem = fileSystem{}
+	var fileSystem = util.FileSystem{}
 
 	var currentLocation = "/"
-	var currentFolder = fileSystem.getSubfolderAndCreateIfNotExists("/")
+	var currentFolder = fileSystem.GetSubfolderAndCreateIfNotExists("/")
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -100,15 +66,15 @@ func main() {
 					currentLocation = filepath.Join(currentLocation, newLocation)
 				}
 
-				currentFolder = fileSystem.getSubfolderAndCreateIfNotExists("/")
+				currentFolder = fileSystem.GetSubfolderAndCreateIfNotExists("/")
 				if currentLocation != "/" {
-					currentFolder = currentFolder.subfolders.getSubfolderRecursivelyFromRoot(strings.Split(currentLocation[1:], "/"))
+					currentFolder = currentFolder.Subfolders.GetSubfolderRecursivelyFromRoot(strings.Split(currentLocation[1:], "/"))
 				}
 			}
 		} else if strings.HasPrefix(line, "dir") {
-			currentFolder.subfolders.getSubfolderAndCreateIfNotExists(commandParts[1])
+			currentFolder.Subfolders.GetSubfolderAndCreateIfNotExists(commandParts[1])
 		} else {
-			currentFolder.files[commandParts[1]] = helpers.ParseInt(commandParts[0])
+			currentFolder.Files[commandParts[1]] = helpers.ParseInt(commandParts[0])
 		}
 	}
 
