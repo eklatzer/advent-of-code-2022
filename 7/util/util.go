@@ -7,6 +7,13 @@ type DirectoryWithFiles struct {
 	Subfolders *FileSystem
 }
 
+func newDirectoryWithFiles() *DirectoryWithFiles {
+	return &DirectoryWithFiles{
+		Files:      make(map[string]int),
+		Subfolders: &FileSystem{},
+	}
+}
+
 type listOfFiles map[string]int
 
 func (l listOfFiles) TotalFileSize() int {
@@ -26,10 +33,7 @@ func (f *FileSystem) GetSubfolderRecursivelyFromRoot(paths []string) *DirectoryW
 
 func (f *FileSystem) GetSubfolderAndCreateIfNotExists(subpath string) *DirectoryWithFiles {
 	if (*f)[subpath] == nil {
-		(*f)[subpath] = &DirectoryWithFiles{
-			Files:      make(map[string]int),
-			Subfolders: &FileSystem{},
-		}
+		(*f)[subpath] = newDirectoryWithFiles()
 	}
 	return (*f)[subpath]
 }
