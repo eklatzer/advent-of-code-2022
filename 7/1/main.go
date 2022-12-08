@@ -83,7 +83,7 @@ func main() {
 	var fileSystem = fileSystem{}
 
 	var currentLocation = "/"
-	var currentSubfolder = fileSystem.getSubfolderAndCreateIfNotExists("/")
+	var currentFolder = fileSystem.getSubfolderAndCreateIfNotExists("/")
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -92,34 +92,24 @@ func main() {
 		if strings.HasPrefix(line, "$") {
 			if commandParts[1] == "cd" {
 				newLocation := commandParts[2]
-				if newLocation == "/" {
-					currentLocation = "/"
-					currentSubfolder = fileSystem.getSubfolderAndCreateIfNotExists("/")
+				if strings.HasPrefix(newLocation, "/") {
+					currentLocation = newLocation
 				} else if newLocation == ".." {
 					pathParts := strings.Split(currentLocation[1:], "/")
 					currentLocation = fmt.Sprintf("/%s", strings.Join(pathParts[:len(pathParts)-1], "/"))
-					root := fileSystem.getSubfolderAndCreateIfNotExists("/")
-					if currentLocation == "/" {
-						currentSubfolder = root
-					} else {
-						currentSubfolder = root.subfolders.getSubfolderRecursivelyFromRoot(strings.Split(currentLocation[1:], "/"))
-					}
 				} else {
 					currentLocation = filepath.Join(currentLocation, newLocation)
-					if currentLocation == "/" {
-						currentSubfolder = fileSystem.getSubfolderAndCreateIfNotExists("/")
-					} else {
-						currentSubfolder = currentSubfolder.subfolders.getSubfolderAndCreateIfNotExists(newLocation)
-					}
+				}
+
+				currentFolder = fileSystem.getSubfolderAndCreateIfNotExists("/")
+				if currentLocation != "/" {
+					currentFolder = currentFolder.subfolders.getSubfolderRecursivelyFromRoot(strings.Split(currentLocation[1:], "/"))
 				}
 			}
 		} else if strings.HasPrefix(line, "dir") {
-			// Handle dir
-			currentSubfolder.subfolders.getSubfolderAndCreateIfNotExists(commandParts[1])
+			currentFolder.subfolders.getSubfolderAndCreateIfNotExists(commandParts[1])
 		} else {
-			// handle file
-			log.Println(line)
-			currentSubfolder.files[commandParts[1]] = parseInt(commandParts[0])
+			currentFolder.files[commandParts[1]] = parseInt(commandParts[0])
 		}
 	}
 
