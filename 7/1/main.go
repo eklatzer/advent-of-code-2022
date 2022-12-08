@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"advent-of-code-2022/helpers"
@@ -109,19 +108,11 @@ func main() {
 		} else if strings.HasPrefix(line, "dir") {
 			currentFolder.subfolders.getSubfolderAndCreateIfNotExists(commandParts[1])
 		} else {
-			currentFolder.files[commandParts[1]] = parseInt(commandParts[0])
+			currentFolder.files[commandParts[1]] = helpers.ParseInt(commandParts[0])
 		}
 	}
 
 	log.Println(generateResult("", fileSystem))
 	log.Println("result:")
 	log.Println(testSum)
-}
-
-func parseInt(in string) int {
-	val, err := strconv.Atoi(in)
-	if err != nil {
-		panic(err)
-	}
-	return val
 }
