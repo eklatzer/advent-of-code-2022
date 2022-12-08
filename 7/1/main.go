@@ -15,28 +15,6 @@ func init() {
 	flag.Parse()
 }
 
-var testSum = 0
-
-func generateResult(pathBefore string, fileSystem util.FileSystem) int {
-	var totalSize = 0
-	for path, folderContent := range fileSystem {
-		fileSize := folderContent.Files.TotalFileSize()
-		var currentPath = ""
-		if pathBefore == "" {
-			currentPath = fmt.Sprintf("%s", path)
-		} else {
-			currentPath = fmt.Sprintf("%s/%s", pathBefore, path)
-		}
-		subSize := generateResult(currentPath, *folderContent.Subfolders)
-		if (fileSize + subSize) <= 100000 {
-			testSum += (fileSize + subSize)
-			fmt.Printf("size for %s: %d (files: %d, sub: %d)\n", currentPath, (fileSize + subSize), fileSize, subSize)
-		}
-		totalSize += fileSize + subSize
-	}
-	return totalSize
-}
-
 func main() {
 	scanner, file, err := helpers.GetInput(helpers.GetInputFilePath())
 	defer file.Close()
@@ -81,4 +59,26 @@ func main() {
 	log.Println(generateResult("", fileSystem))
 	log.Println("result:")
 	log.Println(testSum)
+}
+
+var testSum = 0
+
+func generateResult(pathBefore string, fileSystem util.FileSystem) int {
+	var totalSize = 0
+	for path, folderContent := range fileSystem {
+		fileSize := folderContent.Files.TotalFileSize()
+		var currentPath = ""
+		if pathBefore == "" {
+			currentPath = fmt.Sprintf("%s", path)
+		} else {
+			currentPath = fmt.Sprintf("%s/%s", pathBefore, path)
+		}
+		subSize := generateResult(currentPath, *folderContent.Subfolders)
+		if (fileSize + subSize) <= 100000 {
+			testSum += (fileSize + subSize)
+			fmt.Printf("size for %s: %d (files: %d, sub: %d)\n", currentPath, (fileSize + subSize), fileSize, subSize)
+		}
+		totalSize += fileSize + subSize
+	}
+	return totalSize
 }
