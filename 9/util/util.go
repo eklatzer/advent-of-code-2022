@@ -33,7 +33,7 @@ type Position struct {
 	Y int
 }
 
-func (tail *Position) Follow(head *Position) {
+func (tail *Position) Follow(head Position) {
 	deltaX := head.X - tail.X
 	deltaY := head.Y - tail.Y
 

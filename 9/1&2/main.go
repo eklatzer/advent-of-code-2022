@@ -8,7 +8,10 @@ import (
 	"advent-of-code-2022/helpers"
 )
 
+var numberOfKnots int
+
 func init() {
+	flag.IntVar(&numberOfKnots, "n", 2, "Number of knots") // part 1: n=2, part 2: n=10
 	flag.Parse()
 }
 
@@ -19,8 +22,7 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	headPosition := &util.Position{}
-	tailPosition := &util.Position{}
+	positions := make([]util.Position, numberOfKnots)
 
 	field := helpers.Set[util.Position]{}
 
@@ -34,16 +36,18 @@ func main() {
 		for ; cmd.Distance > 0; cmd.Distance-- {
 			switch cmd.Direction {
 			case util.Up:
-				headPosition.Y++
+				positions[0].Y++
 			case util.Down:
-				headPosition.Y--
+				positions[0].Y--
 			case util.Right:
-				headPosition.X++
+				positions[0].X++
 			case util.Left:
-				headPosition.X--
+				positions[0].X--
 			}
-			tailPosition.Follow(headPosition)
-			field[*tailPosition] = struct{}{}
+			for i := 1; i < len(positions); i++ {
+				positions[i].Follow(positions[i-1])
+			}
+			field[positions[len(positions)-1]] = struct{}{}
 		}
 	}
 
