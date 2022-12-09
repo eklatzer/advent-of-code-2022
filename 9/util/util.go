@@ -33,20 +33,24 @@ type Position struct {
 	Y int
 }
 
-func (p *Position) IsConnectedWith(p2 Position) bool {
-	return p.equal(p2) || p.isDirectlyConnected(p2) || p.isDiagonalConnected(p2)
+func (tail *Position) Follow(head *Position) {
+	deltaX := head.X - tail.X
+	deltaY := head.Y - tail.Y
+
+	if intAbs(deltaX) > 1 || intAbs(deltaY) > 1 {
+		tail.X = tail.X + deltaToNeededSteps(deltaX)
+		tail.Y = tail.Y + deltaToNeededSteps(deltaY)
+	}
 }
 
-func (p *Position) isDirectlyConnected(p2 Position) bool {
-	return (p.X == p2.X && intAbs(p.Y-p2.Y) == 1) || (p.Y == p2.Y && intAbs(p.X-p2.X) == 1)
-}
-
-func (p *Position) isDiagonalConnected(p2 Position) bool {
-	return intAbs(p.X-p2.X) == 1 && intAbs(p.Y-p2.Y) == 1
-}
-
-func (p *Position) equal(p2 Position) bool {
-	return p.X == p2.X && p.Y == p2.Y
+func deltaToNeededSteps(x int) int {
+	if x < 0 {
+		return -1
+	}
+	if x > 0 {
+		return 1
+	}
+	return 0
 }
 
 func intAbs(in int) int {

@@ -19,8 +19,8 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	headPosition := util.Position{}
-	tailPosition := util.Position{}
+	headPosition := &util.Position{}
+	tailPosition := &util.Position{}
 
 	field := helpers.Set[util.Position]{}
 
@@ -35,26 +35,15 @@ func main() {
 			switch cmd.Direction {
 			case util.Up:
 				headPosition.Y++
-				if !headPosition.IsConnectedWith(tailPosition) {
-					tailPosition = util.Position{X: headPosition.X, Y: headPosition.Y - 1}
-				}
 			case util.Down:
 				headPosition.Y--
-				if !headPosition.IsConnectedWith(tailPosition) {
-					tailPosition = util.Position{X: headPosition.X, Y: headPosition.Y + 1}
-				}
 			case util.Right:
 				headPosition.X++
-				if !headPosition.IsConnectedWith(tailPosition) {
-					tailPosition = util.Position{X: headPosition.X - 1, Y: headPosition.Y}
-				}
 			case util.Left:
 				headPosition.X--
-				if !headPosition.IsConnectedWith(tailPosition) {
-					tailPosition = util.Position{X: headPosition.X + 1, Y: headPosition.Y}
-				}
 			}
-			field[tailPosition] = struct{}{}
+			tailPosition.Follow(headPosition)
+			field[*tailPosition] = struct{}{}
 		}
 	}
 
