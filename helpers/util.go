@@ -10,3 +10,11 @@ func ParseInt(in string) int {
 	}
 	return val
 }
+
+// Abs returns the absolute value of the given integer.
+func Abs(in int) int {
+	if in < 0 {
+		return -in
+	}
+	return in
+}
