@@ -21,40 +21,36 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	var starts []*graph.Node[util.Position, byte]
+	var possibleStarts []*graph.Node[util.Position, byte]
 	var destination *graph.Node[util.Position, byte]
 	for _, n := range nodes {
 		if n.Value == 'S' || n.Value == 'a' {
 			n.Value = 'a'
-			starts = append(starts, n)
+			possibleStarts = append(possibleStarts, n)
 		} else if n.Value == 'E' {
 			n.Value = 'z'
 			destination = n
 		}
 	}
 
-	var paths = map[util.Position]int{}
-	log.Println(len(starts))
+	var distances = map[util.Position]int{}
 
-	for _, start := range starts {
-		steps := len(util.FindShortestPath(nodes, start, destination))
-		if steps != 0 {
-			paths[start.Identifier] = steps
+	for _, start := range possibleStarts {
+		steps := util.FindShortestPath(nodes, start, destination)
+		if steps != nil {
+			distances[start.Identifier] = len(steps)
 		}
 	}
 
-	keys := make([]util.Position, 0, len(paths))
+	startsWithPossibleWays := make([]util.Position, 0, len(distances))
 
-	for k := range paths {
-		keys = append(keys, k)
+	for startPosition := range distances {
+		startsWithPossibleWays = append(startsWithPossibleWays, startPosition)
 	}
 
-	sort.SliceStable(keys, func(i, j int) bool {
-		return paths[keys[i]] < paths[keys[j]]
+	sort.SliceStable(startsWithPossibleWays, func(i, j int) bool {
+		return distances[startsWithPossibleWays[i]] < distances[startsWithPossibleWays[j]]
 	})
 
-	for _, position := range keys {
-		log.Printf("%v: %d", position, paths[position])
-	}
-
+	log.Printf("searched shortest path from %d starting points, shortest path starting from %v with distance: %d", len(possibleStarts), startsWithPossibleWays[0], distances[startsWithPossibleWays[0]])
 }

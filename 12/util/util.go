@@ -14,6 +14,11 @@ type Position struct {
 	Y int
 }
 
+type NodeWithPreviousSteps[T comparable, K any] struct {
+	Node  graph.Node[T, K]
+	Steps []graph.Node[T, K]
+}
+
 func GetNodesFromFile(path string) (map[Position]*graph.Node[Position, byte], error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
@@ -24,7 +29,6 @@ func GetNodesFromFile(path string) (map[Position]*graph.Node[Position, byte], er
 	for row, line := range strings.Split(string(file), "\n") {
 		for col := 0; col < len(line); col++ {
 			nodes[Position{X: row, Y: col}] = &graph.Node[Position, byte]{Identifier: Position{X: row, Y: col}, Value: line[col], Neighbours: make(map[Position]*graph.Node[Position, byte])}
-
 		}
 	}
 	return nodes, nil
@@ -34,8 +38,8 @@ func FindShortestPath(nodes map[Position]*graph.Node[Position, byte], root, dest
 	var visited = helpers.Set[Position]{}
 	visited[(*root).Identifier] = struct{}{}
 
-	var queue = queue.New[graph.Element[Position, byte]]()
-	queue.Append(graph.Element[Position, byte]{
+	var queue = queue.New[NodeWithPreviousSteps[Position, byte]]()
+	queue.Append(NodeWithPreviousSteps[Position, byte]{
 		Node:  *root,
 		Steps: []graph.Node[Position, byte]{},
 	})
@@ -53,14 +57,14 @@ func FindShortestPath(nodes map[Position]*graph.Node[Position, byte], root, dest
 				}
 				visited[(*neighbour).Identifier] = struct{}{}
 
-				queue.Append(graph.Element[Position, byte]{
+				queue.Append(NodeWithPreviousSteps[Position, byte]{
 					Node:  *neighbour,
 					Steps: append(currentItem.Steps, currentItem.Node),
 				})
 			}
 		}
 	}
-	return []graph.Node[Position, byte]{}
+	return nil
 }
 
 func getNeighbours(node graph.Node[Position, byte], nodes map[Position]*graph.Node[Position, byte]) []*graph.Node[Position, byte] {
