@@ -15,34 +15,6 @@ func (n *Node[T, K]) AddNeighbour(node *Node[T, K]) {
 	n.Neighbours[node.Identifier] = node
 }
 
-func (n *Node[T, K]) TraverseGraph() []*Node[T, K] {
-	var visited = helpers.Set[T]{}
-	visited[(*n).Identifier] = struct{}{}
-
-	var queue = queue.New[Node[T, K]]()
-	queue.Append(*n)
-
-	var result = []*Node[T, K]{n}
-
-	for queue.Size() > 0 {
-		element, err := queue.Pop()
-		if err != nil {
-			break
-		}
-
-		for _, neighbour := range element.Neighbours {
-			if _, alreadyVisited := visited[(*neighbour).Identifier]; !alreadyVisited {
-				visited[(*neighbour).Identifier] = struct{}{}
-
-				queue.Append(*neighbour)
-				result = append(result, neighbour)
-			}
-		}
-	}
-
-	return result
-}
-
 type Element[T comparable, K any] struct {
 	Node  Node[T, K]
 	Steps []Node[T, K]
