@@ -11,8 +11,12 @@ func ParseInt(in string) int {
 	return val
 }
 
+type Number interface {
+	int | byte
+}
+
 // Abs returns the absolute value of the given integer.
-func Abs(in int) int {
+func Abs[T Number](in T) T {
 	if in < 0 {
 		return -in
 	}
